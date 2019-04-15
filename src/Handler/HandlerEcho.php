@@ -10,6 +10,19 @@ use PE\Component\Cronos\Core\TaskInterface;
 class HandlerEcho extends Handler
 {
     /**
+     * @var bool
+     */
+    private $debug;
+
+    /**
+     * @param bool $debug
+     */
+    public function __construct(bool $debug = false)
+    {
+        $this->debug = $debug;
+    }
+
+    /**
      * @inheritDoc
      */
     public function onStarting(): void
@@ -30,7 +43,9 @@ class HandlerEcho extends Handler
      */
     public function onWaitingTasks(): void
     {
-        echo "Waiting for tasks ...\n";
+        if ($this->debug) {
+            echo "Waiting for tasks ...\n";
+        }
     }
 
     /**
@@ -56,7 +71,7 @@ class HandlerEcho extends Handler
             echo sprintf("Execute task: %s OK\n", $task->getName());
         }
 
-        if (($finishedAt = $task->getFinishedAt()) && ($executedAt = $task->getExecutedAt())) {
+        if ($this->debug && ($finishedAt = $task->getFinishedAt()) && ($executedAt = $task->getExecutedAt())) {
             echo sprintf(
                 "Execute task: %s time: %s\n",
                 $task->getName(),
