@@ -27,7 +27,7 @@ class HandlerEcho extends Handler
      */
     public function onStarting(): void
     {
-        echo "Starting server ...\n";
+        $this->log('Starting server ...');
     }
 
     /**
@@ -35,7 +35,7 @@ class HandlerEcho extends Handler
      */
     public function onStarted(): void
     {
-        echo "Starting server OK\n";
+        $this->log('Starting server OK');
     }
 
     /**
@@ -44,7 +44,7 @@ class HandlerEcho extends Handler
     public function onWaitingTasks(): void
     {
         if ($this->debug) {
-            echo "Waiting for tasks ...\n";
+            $this->log("Waiting for tasks ...");
         }
     }
 
@@ -53,7 +53,7 @@ class HandlerEcho extends Handler
      */
     public function onTaskExecuted(TaskInterface $task): void
     {
-        echo sprintf("Execute task: %s ...\n", $task->getName());
+        $this->log(sprintf('Execute task: %s ...', $task->getName()));
     }
 
     /**
@@ -62,21 +62,25 @@ class HandlerEcho extends Handler
     public function onTaskFinished(TaskInterface $task): void
     {
         if ($task->getStatus() === TaskInterface::STATUS_ERROR) {
-            echo sprintf("Execute task: %s ERROR\n", $task->getName());
+            $this->log(sprintf('Execute task: %s ERROR', $task->getName()));
 
             if ($error = $task->getError()) {
-                echo "{$error}\n";
+                if ($this->debug) {
+                    $this->log((string) $error);
+                } else {
+                    $this->log($error->getMessage());
+                }
             }
         } else {
-            echo sprintf("Execute task: %s OK\n", $task->getName());
+            $this->log( sprintf('Execute task: %s OK', $task->getName()));
         }
 
         if ($this->debug && ($finishedAt = $task->getFinishedAt()) && ($executedAt = $task->getExecutedAt())) {
-            echo sprintf(
-                "Execute task: %s time: %s\n",
+            $this->log(sprintf(
+                'Execute task: %s time: %s',
                 $task->getName(),
                 $this->formatDuration(($finishedAt->format('U.u') - $executedAt->format('U.u')) * 1000)
-            );
+            ));
         }
     }
 
@@ -85,7 +89,7 @@ class HandlerEcho extends Handler
      */
     public function onStopping(): void
     {
-        echo "Stopping server ...\n";
+        $this->log('Stopping server ...');
     }
 
     /**
@@ -93,6 +97,14 @@ class HandlerEcho extends Handler
      */
     public function onStopped(): void
     {
-        echo "Stopping server OK\n";
+        $this->log('Stopping server OK');
+    }
+
+    /**
+     * @param string $message
+     */
+    private function log(string $message): void
+    {
+        echo date('Y-m-d H:i:s') . ': ' . $message . "\n";
     }
 }
