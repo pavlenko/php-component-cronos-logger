@@ -11,20 +11,20 @@ class HandlerEchoTest extends TestCase
 {
     public function testOnStarting(): void
     {
-        $this->expectOutputString("Starting server ...\n");
+        $this->expectOutputString(date('Y-m-d H:i:s') . ': ' . "Starting server ...\n");
         (new HandlerEcho())->onStarting();
     }
 
     public function testOnStarted(): void
     {
-        $this->expectOutputString("Starting server OK\n");
+        $this->expectOutputString(date('Y-m-d H:i:s') . ': ' . "Starting server OK\n");
         (new HandlerEcho())->onStarted();
     }
 
     public function testOnWaitingTasks(): void
     {
-        $this->expectOutputString("Waiting for tasks ...\n");
-        (new HandlerEcho())->onWaitingTasks();
+        $this->expectOutputString(date('Y-m-d H:i:s') . ': ' . "Waiting for tasks ...\n");
+        (new HandlerEcho(true))->onWaitingTasks();
     }
 
     public function testOnTaskExecuted(): void
@@ -33,7 +33,7 @@ class HandlerEchoTest extends TestCase
         $task = $this->createMock(TaskInterface::class);
         $task->expects(static::once())->method('getName')->willReturn('Foo');
 
-        $this->expectOutputString("Execute task: Foo ...\n");
+        $this->expectOutputString(date('Y-m-d H:i:s') . ': ' . "Execute task: Foo ...\n");
         (new HandlerEcho())->onTaskExecuted($task);
     }
 
@@ -44,7 +44,7 @@ class HandlerEchoTest extends TestCase
         $task->expects(static::once())->method('getName')->willReturn('Foo');
         $task->expects(static::once())->method('getStatus')->willReturn(TaskInterface::STATUS_DONE);
 
-        $this->expectOutputString("Execute task: Foo OK\n");
+        $this->expectOutputString(date('Y-m-d H:i:s') . ': ' . "Execute task: Foo OK\n");
         (new HandlerEcho())->onTaskFinished($task);
     }
 
@@ -61,8 +61,9 @@ class HandlerEchoTest extends TestCase
         $task->expects(static::once())->method('getExecutedAt')->willReturn($date1);
         $task->expects(static::once())->method('getFinishedAt')->willReturn($date2);
 
-        $this->expectOutputString("Execute task: Foo OK\nExecute task: Foo time: 000h 00m 01s 500ms\n");
-        (new HandlerEcho())->onTaskFinished($task);
+        $date = date('Y-m-d H:i:s') . ': ';
+        $this->expectOutputString("{$date}Execute task: Foo OK\n{$date}Execute task: Foo time: 000h 00m 01s 500ms\n");
+        (new HandlerEcho(true))->onTaskFinished($task);
     }
 
     public function testOnTaskFinishedError(): void
@@ -72,7 +73,7 @@ class HandlerEchoTest extends TestCase
         $task->expects(static::once())->method('getName')->willReturn('Foo');
         $task->expects(static::once())->method('getStatus')->willReturn(TaskInterface::STATUS_ERROR);
 
-        $this->expectOutputString("Execute task: Foo ERROR\n");
+        $this->expectOutputString(date('Y-m-d H:i:s') . ': ' . "Execute task: Foo ERROR\n");
         (new HandlerEcho())->onTaskFinished($task);
     }
 
@@ -86,19 +87,20 @@ class HandlerEchoTest extends TestCase
         $task->expects(static::once())->method('getStatus')->willReturn(TaskInterface::STATUS_ERROR);
         $task->expects(static::once())->method('getError')->willReturn($exception);
 
-        $this->expectOutputString("Execute task: Foo ERROR\n{$exception}\n");
-        (new HandlerEcho())->onTaskFinished($task);
+        $date = date('Y-m-d H:i:s') . ': ';
+        $this->expectOutputString("{$date}Execute task: Foo ERROR\n{$date}{$exception}\n");
+        (new HandlerEcho(true))->onTaskFinished($task);
     }
 
     public function testOnStopping(): void
     {
-        $this->expectOutputString("Stopping server ...\n");
+        $this->expectOutputString(date('Y-m-d H:i:s') . ': ' . "Stopping server ...\n");
         (new HandlerEcho())->onStopping();
     }
 
     public function testOnStopped(): void
     {
-        $this->expectOutputString("Stopping server OK\n");
+        $this->expectOutputString(date('Y-m-d H:i:s') . ': ' . "Stopping server OK\n");
         (new HandlerEcho())->onStopped();
     }
 }
