@@ -27,7 +27,7 @@ class HandlerEcho extends Handler
      */
     public function onStarting(): void
     {
-        $this->log('Starting server ...');
+        $this->log('Starting server ...' . ($this->debug ? ' [DEBUG ON]' : ''));
     }
 
     /**
